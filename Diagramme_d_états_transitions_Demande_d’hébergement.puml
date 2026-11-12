@@ -1,0 +1,14 @@
+@startuml
+[*] --> EnAttente : demande enregistrée
+
+EnAttente --> Acceptee : chambre attribuée\n[places disponibles]
+EnAttente --> Refusee : aucune place\n/ refus du responsable
+EnAttente --> Annulee : l'étudiant annule
+
+Acceptee --> Terminee : départ enregistré
+Acceptee --> Annulee : l'étudiant renonce\navant l'entrée
+
+Refusee --> [*]
+Annulee --> [*]
+Terminee --> [*]
+@enduml

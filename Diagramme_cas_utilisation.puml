@@ -1,0 +1,32 @@
+@startuml Diagramme_cas_utilisation
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Étudiant" as E
+actor "Responsable\nde la résidence" as R
+
+rectangle "Système de gestion de la résidence" {
+  usecase "Enregistrer une demande\nd'hébergement" as UC1
+  usecase "Vérifier les places\ndisponibles" as UC2
+  usecase "Attribuer une chambre" as UC3
+  usecase "Enregistrer un départ" as UC4
+  usecase "Consulter les chambres\noccupées et libres" as UC5
+  usecase "Consulter l'historique\ndes occupations" as UC6
+  usecase "Calculer le taux d'occupation\net afficher les statistiques" as UC7
+  usecase "Refuser une demande" as UC8
+}
+
+E --> UC1
+E --> UC4
+
+R --> UC3
+R --> UC4
+R --> UC5
+R --> UC6
+R --> UC7
+R --> UC8
+
+UC3 ..> UC2 : <<include>>
+UC8 ..> UC3 : <<extend>>
+UC7 ..> UC5 : <<include>>
+@enduml

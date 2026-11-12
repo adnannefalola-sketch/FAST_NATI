@@ -1,0 +1,34 @@
+@startuml diagramme_sequence
+actor Responsable
+participant "Interface\n(Application)" as UI
+participant ":DemandeHebergement" as D
+participant ":Etudiant" as E
+participant ":Residence" as R
+participant ":Chambre" as C
+participant ":Attribution" as A
+
+Responsable -> UI : choisirDemande(idDemande)
+UI -> D : getStatut()
+D --> UI : EN_ATTENTE
+
+UI -> E : aDejaUneChambre()
+E --> UI : false
+
+UI -> R : getPlacesDisponibles()
+R --> UI : nombre de places
+
+alt Places disponibles
+  UI -> R : trouverChambreLibre()
+  R --> UI : chambre
+  UI -> C : estDisponible()
+  C --> UI : true
+  UI -> A : create(etudiant, chambre, dateDebut)
+  A --> UI : attribution créée
+  UI -> C : changerStatut(OCCUPEE)
+  UI -> D : accepter()
+  UI --> Responsable : Chambre attribuée avec succès
+else Aucune place disponible
+  UI -> D : refuser()
+  UI --> Responsable : Demande refusée (résidence pleine)
+end
+@enduml

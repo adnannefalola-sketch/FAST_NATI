@@ -1,0 +1,87 @@
+@startuml diagramme_de_classe
+skinparam classAttributeIconSize 0
+
+enum StatutChambre {
+  LIBRE
+  OCCUPEE
+  EN_MAINTENANCE
+}
+
+enum StatutDemande {
+  EN_ATTENTE
+  ACCEPTEE
+  REFUSEE
+  ANNULEE
+  TERMINEE
+}
+
+class Residence {
+  - idResidence : int
+  - nom : String
+  - adresse : String
+  --
+  + getPlacesDisponibles() : int
+  + calculerTauxOccupation() : double
+  + afficherStatistiques() : void
+}
+
+class Batiment {
+  - idBatiment : int
+  - nom : String
+  - nombreChambre : int
+  --
+  + getChambresLibres() : List<Chambre>
+  + getChambresOccupees() : List<Chambre>
+}
+
+class Chambre {
+  - numero : String
+  - etage : int
+  - capacite : int
+  - statut : StatutChambre
+  --
+  + estDisponible() : boolean
+  + getPlacesRestantes() : int
+  + changerStatut(s : StatutChambre) : void
+}
+
+class Etudiant {
+  - matricule : String
+  - nom : String
+  - prenom : String
+  - sexe : char
+  - telephone : String
+  --
+  + aDejaUneChambre() : boolean
+}
+
+class DemandeHebergement {
+  - idDemande : int
+  - dateDemande : Date
+  - statut : StatutDemande
+  - motif : String
+  --
+  + accepter() : void
+  + refuser() : void
+  + annuler() : void
+}
+
+class Attribution {
+  - idAttribution : int
+  - dateDebut : Date
+  - dateFin : Date
+  - active : boolean
+  --
+  + terminer(dateDepart : Date) : void
+  + estEnCours() : boolean
+}
+
+Residence "1" *-- "1..*" Batiment : contient
+Batiment "1" *-- "1..*" Chambre : contient
+Etudiant "1" -- "0..*" DemandeHebergement : dépose
+DemandeHebergement "1" -- "0..1" Attribution : donne lieu à
+Attribution "0..*" --> "1" Chambre : concerne
+Attribution "0..*" --> "1" Etudiant : bénéficiaire
+Chambre ..> StatutChambre
+DemandeHebergement ..> StatutDemande
+@enduml

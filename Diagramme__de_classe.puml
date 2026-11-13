@@ -1,0 +1,147 @@
+@startuml diagramme de classe
+title Agence de voyage de Cotonou - Diagramme de classes
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam classFontStyle bold
+
+enum StatutReservation {
+  EN_ATTENTE
+  VALIDEE
+  ANNULEE
+}
+
+enum StatutRemboursement {
+  AUCUN
+  A_REMBOURSER
+  REMBOURSE
+}
+
+class Passager {
+  - id : int
+  - nom : string
+  - prenom : string
+  - telephone : string
+  - email : string
+  + Passager(id : int, nom : string, prenom : string, telephone : string, email : string)
+  + getId() : int
+  + getNom() : string
+  + getPrenom() : string
+  + getTelephone() : string
+  + getEmail() : string
+  + nomComplet() : string
+  + afficher() : void
+}
+
+class Vol {
+  - numero : string
+  - depart : string
+  - destination : string
+  - date : string
+  - heure : string
+  - capacite : int
+  - prix : double
+  - placesReservees : int
+  + Vol(numero : string, depart : string, destination : string, date : string, heure : string, capacite : int, prix : double)
+  + getNumero() : string
+  + getDepart() : string
+  + getDestination() : string
+  + getDate() : string
+  + getHeure() : string
+  + getCapacite() : int
+  + getPrix() : double
+  + getPlacesReservees() : int
+  + placesDisponibles() : int
+  + estComplet() : bool
+  + occuperPlace() : void
+  + libererPlace() : void
+  + {static} afficherEntete() : void
+  + afficherLigne() : void
+}
+
+class Reservation {
+  - numero : int
+  - statut : StatutReservation
+  - paye : bool
+  - montantPaye : double
+  - remboursement : StatutRemboursement
+  + Reservation(numero : int, passager : Passager*, vol : Vol*)
+  + getNumero() : int
+  + getPassager() : Passager*
+  + getVol() : Vol*
+  + getStatut() : StatutReservation
+  + estPayee() : bool
+  + getMontantPaye() : double
+  + getRemboursement() : StatutRemboursement
+  + estActive() : bool
+  + valider() : void
+  + enregistrerPaiement(montant : double) : void
+  + annuler() : void
+  + marquerRembourse() : void
+  + afficher() : void
+}
+
+class Agence {
+  - nom : string
+  - passagers : vector<unique_ptr<Passager>>
+  - vols : vector<unique_ptr<Vol>>
+  - reservations : vector<unique_ptr<Reservation>>
+  - prochainIdPassager : int
+  - prochainNumeroReservation : int
+  + Agence(nom : string)
+  + enregistrerPassager(...) : Passager*
+  + ajouterVol(...) : Vol*
+  + afficherVolsDisponibles() : void
+  + rechercherVol(critere : string) : void
+  + effectuerReservation(idPassager : int, numeroVol : string) : Reservation*
+  + enregistrerPaiement(numeroReservation : int, montant : double) : void
+  + annulerReservation(numeroReservation : int) : bool
+  + rembourser(numeroReservation : int) : void
+  + consulterReservations() : void
+  + afficherReservation(numeroReservation : int) : void
+  + trouverPassager(id : int) : Passager*
+  + trouverVol(numero : string) : Vol*
+  + trouverReservation(numero : int) : Reservation*
+}
+
+class Menu {
+  - agence : Agence&
+  + Menu(agence : Agence&)
+  + afficher() : void
+  + executer() : void
+  - saisirEntier(message : string, min : int, max : int) : int
+  - saisirReel(message : string, min : double) : double
+  - saisirTexte(message : string) : string
+  - saisirDate(message : string) : string
+  - saisirHeure(message : string) : string
+}
+
+class ErreurMetier <<exception>> {
+  + ErreurMetier(message : string)
+  + what() : const char*
+}
+
+Agence ..> ErreurMetier : lève
+Reservation ..> ErreurMetier : lève
+Vol ..> ErreurMetier : lève
+
+Passager "1" <-- "0..*" Reservation : effectue par
+Vol "1" <-- "0..*" Reservation : concerne
+Reservation --> StatutReservation
+Reservation --> StatutRemboursement
+
+Agence "1" *-- "0..*" Passager : gère
+Agence "1" *-- "0..*" Vol : propose
+Agence "1" *-- "0..*" Reservation : enregistre
+
+Menu "1" --> "1" Agence : utilise
+
+note bottom of Reservation
+  Règles métier :
+  - un passager n'a qu'une réservation active par vol
+  - réservation annulée => paiement impossible
+  - place définitivement réservée après validation
+  - annulation d'une réservation payée => A_REMBOURSER
+end note
+
+@enduml
